@@ -1,0 +1,63 @@
+import streamlit as st
+import google.generativeai as genai
+
+# Configure API Key
+my_api = 'AIzaSyCYiWN5hpK0sHNw5vhjKXU644HYnsoF34I'
+try:
+    genai.configure(api_key=my_api)
+except Exception as e:
+    st.error("Error configuring API. Please check your API key.")
+    st.stop()
+
+# App Title and Custom Sidebar
+st.set_page_config(page_title="Shahleen's AI Code Reviewer", page_icon="🤖", layout="wide")
+st.sidebar.title("🤖 AI Code Reviewer")
+st.sidebar.markdown("Welcome to Shahleen's AI-powered Python Code Reviewer App! 🎉")
+st.sidebar.info("""
+### How it works:
+1. Enter your Python code in the text area.
+2. Click **Generate** to review the code.
+3. Get detailed feedback, including potential bugs and suggestions.
+""")
+st.sidebar.write("---")
+st.sidebar.markdown("**About this app**")
+st.sidebar.write("""
+This app leverages Google Generative AI to analyze your Python code for bugs and provides feedback to improve your programming!
+""")
+
+# Main Layout
+st.title("🤖 Shahleen's AI Code Reviewer App")
+st.markdown("**Shahleen!**")
+st.write("Enter your Python code below for review:")
+
+# Input Section
+user_code = st.text_area("Paste your Python code here:", height=300, placeholder="e.g., def add(a, b): return a + b")
+
+# Add a nice Generate button
+if st.button("✨ Generate Review"):
+    if user_code.strip():  # Ensure non-empty input
+        try:
+            # Initialize generative model
+            with st.spinner("Analyzing your code with AI... 🚀"):
+                llm = genai.GenerativeModel("models/gemini-1.5-flash")
+                chatbot = llm.start_chat(history=[])
+                response = chatbot.send_message(f"Review the following Python code and identify any bugs:\n{user_code}")
+            
+            # Display Response
+            st.success("Code review completed successfully! 🎉")
+            st.subheader("Code Review Output 🛠️")
+            st.markdown("### **Bug Report:**")
+            st.write(response.text)
+            
+            # Show balloons
+            st.balloons()
+
+        except Exception as e:
+            st.error(f"An error occurred during the code review: {str(e)}")
+    else:
+        st.warning("Please enter some Python code to analyze.")
+
+# Add an inspirational footer
+st.markdown("---")
+st.markdown("### 🌟 Keep learning and coding! 🌟")
+st.write("_“The only way to learn a new programming language is by writing programs in it.”_ – Dennis Ritchie")
